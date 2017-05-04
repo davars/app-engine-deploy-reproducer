@@ -5,11 +5,17 @@ import (
 	"net/http"
 	"time"
 
+	"unstableapi"
+
 	"golang.org/x/net/context"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
 	"google.golang.org/appengine/user"
 )
+
+func Message() string {
+	return unstableapi.Message()
+}
 
 func Root(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
@@ -28,7 +34,10 @@ func Root(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := guestbookTemplate.Execute(w, greetings); err != nil {
+	if err := guestbookTemplate.Execute(w, map[string]interface{}{
+		"greetings": greetings,
+		"message":   Message(),
+	}); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -51,7 +60,7 @@ var guestbookTemplate = template.Must(template.New("book").Parse(`
     <title>Go Guestbook</title>
   </head>
   <body>
-    {{range .}}
+    {{range .greetings}}
       {{with .Author}}
         <p><b>{{.}}</b> wrote:</p>
       {{else}}
@@ -63,6 +72,7 @@ var guestbookTemplate = template.Must(template.New("book").Parse(`
       <div><textarea name="content" rows="3" cols="60"></textarea></div>
       <div><input type="submit" value="Sign Guestbook"></div>
     </form>
+		<p>Message is: {{.message}}</p>
   </body>
 </html>
 `))
