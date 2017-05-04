@@ -5,8 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"unstableapi"
-
+	"github.com/davars/unstableapi"
 	"golang.org/x/net/context"
 	"google.golang.org/appengine"
 	"google.golang.org/appengine/datastore"
